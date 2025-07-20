@@ -1,7 +1,7 @@
 // src/lib/utils.ts
 import type { LoginRequest, RegisterRequest, RefreshTokenRequest, AuthResponse, User } from '../types/user';
 
-const API_BASE_URL = 'http://localhost:8000/api/v1';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
 
 class ApiClient {
   private baseURL: string;
@@ -93,6 +93,18 @@ class ApiClient {
       method: 'DELETE',
     });
   }
+
+  async updateUserProfile(profileId: string, data: any): Promise<any> {
+    return this.request(`/users-profile/${profileId}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+  }
 }
 
 export const apiClient = new ApiClient(API_BASE_URL);
+
+// Función utilitaria para combinar clases de Tailwind (shadcn/ui)
+export function cn(...inputs: (string | undefined | null | false)[]): string {
+  return inputs.filter(Boolean).join(' ');
+}

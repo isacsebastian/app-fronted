@@ -12,7 +12,9 @@ export const useAuth = () => {
     logout,
     refreshAuth,
     updateProfile,
+    updateUserProfile,
     clearError,
+    isHydrating,
   } = useUserStore();
 
   const isAuthenticated = !!user && !!useUserStore.getState().accessToken;
@@ -39,6 +41,8 @@ export const useAuth = () => {
     logout,
     refreshAuth,
     updateProfile,
+    updateUserProfile,
     clearError,
+    isHydrating,
   };
 };

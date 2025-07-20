@@ -1,180 +1,116 @@
 // src/components/user/LoginForm.tsx
-import React, { useState } from 'react';
-import { useAuth } from '../../hooks/useAuth';
-import type { LoginRequest } from '../../types/user';
+import React, { useState } from "react";
+import { useAuth } from "../../hooks/useAuth";
+import type { LoginRequest } from "../../types/user";
+import { useNavigate } from "react-router-dom";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { Input } from "../ui/input";
+import { Button } from "../ui/button";
 
-interface LoginFormProps {
-  onSuccess?: () => void;
-  onRegisterClick?: () => void;
-}
+const demoUsers = [
+  { label: "Administrador", email: "admin@lupa.com", color: "blue" },
+  { label: "Cliente", email: "cliente1@gmail.com", color: "purple" },
+];
 
-const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onRegisterClick }) => {
+const LoginForm: React.FC = () => {
   const { login, isLoading, error, clearError } = useAuth();
-  
-  const [formData, setFormData] = useState<LoginRequest>({
-    email: '',
-    password: ''
-  });
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState<LoginRequest>({ email: "", password: "" });
+  const [showPassword, setShowPassword] = useState(false);
 
-  const [showPassword, setShowPassword] = useState<boolean>(false);
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     clearError();
-    
     try {
       await login(formData);
-      onSuccess?.();
-    } catch (error) {
-      console.error('Error en login:', error);
+      navigate("/dashboard");
+    } catch (err) {
+      // error ya manejado por el store
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-
-  const toggleShowPassword = () => {
-    setShowPassword(prev => !prev);
-  };
-
-  const fillDemoUser = (email: string) => {
-    setFormData({
-      email,
-      password: '' // Usuario debe poner la contraseña real
-    });
-  };
-
   return (
-    <div className="w-full max-w-md mx-auto">
-      <div className="bg-white shadow-lg rounded-lg px-8 py-6">
-        <div className="text-center mb-6">
-          <h2 className="text-2xl font-bold text-gray-900">Iniciar Sesión</h2>
-          <p className="text-gray-600 mt-2">Accede a tu cuenta</p>
-        </div>
-
-        {error && (
-          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
-            <div className="flex">
-              <div className="text-red-800 text-sm">{error}</div>
-              <button 
-                onClick={clearError}
-                className="ml-auto text-red-600 hover:text-red-800"
-              >
-                ×
-              </button>
-            </div>
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-              Correo Electrónico
-            </label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="tu@email.com"
-              disabled={isLoading}
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-100">
+      <Card className="w-full max-w-md shadow-xl border-0">
+        <CardHeader className="flex flex-col items-center">
+          <div className="h-16 w-16 rounded-full overflow-hidden bg-white border border-gray-200 flex items-center justify-center shadow mb-2">
+            <img
+              src="/LOGO-LUPA-1.webp"
+              alt="Lupa Logo"
+              className="object-contain h-12 w-12"
+              style={{ maxHeight: 48, maxWidth: 48 }}
             />
           </div>
-
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-              Contraseña
-            </label>
+          <CardTitle className="text-2xl font-bold text-gray-900">Iniciar Sesión</CardTitle>
+          <p className="text-gray-500 text-sm mt-1">Accede a tu cuenta para continuar</p>
+        </CardHeader>
+        <CardContent>
+          {error && (
+            <div className="mb-4 p-2 bg-red-50 border border-red-200 rounded text-red-700 text-sm flex items-center justify-between">
+              <span>{error}</span>
+              <button onClick={clearError} className="ml-2 text-red-500 hover:text-red-700">×</button>
+            </div>
+          )}
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <Input
+              type="email"
+              name="email"
+              placeholder="Correo Electrónico"
+              value={formData.email}
+              onChange={e => setFormData(f => ({ ...f, email: e.target.value }))}
+              required
+              disabled={isLoading}
+              autoComplete="username"
+            />
             <div className="relative">
-              <input
-                type={showPassword ? 'text' : 'password'}
-                id="password"
+              <Input
+                type={showPassword ? "text" : "password"}
                 name="password"
+                placeholder="Contraseña"
                 value={formData.password}
-                onChange={handleChange}
+                onChange={e => setFormData(f => ({ ...f, password: e.target.value }))}
                 required
-                className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="••••••••"
                 disabled={isLoading}
+                autoComplete="current-password"
               />
               <button
                 type="button"
-                onClick={toggleShowPassword}
-                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                tabIndex={-1}
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                onClick={() => setShowPassword(s => !s)}
               >
-                {showPassword ? '👁️' : '👁️‍🗨️'}
+                {showPassword ? "👁️" : "👁️‍🗨️"}
               </button>
             </div>
-          </div>
-
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          >
-            {isLoading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
-          </button>
-        </form>
-
-        {onRegisterClick && (
-          <div className="mt-6 text-center">
-            <p className="text-sm text-gray-600">
-              ¿No tienes cuenta?{' '}
-              <button
-                onClick={onRegisterClick}
-                className="text-blue-600 hover:text-blue-500 font-medium"
-              >
-                Regístrate aquí
-              </button>
-            </p>
-          </div>
-        )}
-
-        {/* Usuarios de demo */}
-        <div className="mt-6 p-4 bg-gray-50 rounded-md border">
-          <h3 className="text-sm font-semibold text-gray-700 mb-3">🚀 Usuarios de prueba:</h3>
-          <div className="space-y-2">
-            <div className="flex justify-between items-center">
-              <div className="text-xs">
-                <div className="font-medium">Administrador</div>
-                <div className="text-gray-600">admin@lupa.com</div>
-              </div>
+            <Button
+              type="submit"
+              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold"
+              disabled={isLoading}
+            >
+              {isLoading ? "Iniciando sesión..." : "Iniciar Sesión"}
+            </Button>
+          </form>
+          <div className="mt-4 text-center space-y-2">
+            <span className="text-sm text-gray-600">¿No tienes cuenta?</span>{" "}
+            <button
+              type="button"
+              className="text-blue-600 hover:text-blue-500 font-medium"
+              onClick={() => navigate("/register")}
+            >
+              Regístrate aquí
+            </button>
+            <div>
               <button
                 type="button"
-                onClick={() => fillDemoUser('admin@lupa.com')}
-                className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded hover:bg-blue-200"
+                className="text-xs text-blue-500 hover:underline mt-2"
+                onClick={() => alert('Funcionalidad de recuperación de contraseña próximamente.')}
               >
-                Usar
-              </button>
-            </div>
-            
-            <div className="flex justify-between items-center">
-              <div className="text-xs">
-                <div className="font-medium">Cliente</div>
-                <div className="text-gray-600">cliente1@gmail.com</div>
-              </div>
-              <button
-                type="button"
-                onClick={() => fillDemoUser('cliente1@gmail.com')}
-                className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded hover:bg-purple-200"
-              >
-                Usar
+                ¿Olvidaste tu contraseña?
               </button>
             </div>
           </div>
-          <p className="text-xs text-gray-500 mt-2">
-            * Recuerda poner la contraseña correcta del seed
-          </p>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
