@@ -1,4 +1,5 @@
 import { useUserStore } from '../../stores/userStore';
+import { Link } from 'react-router-dom';
 
 export function Header() {
   const user = useUserStore((state) => state.user);
@@ -8,7 +9,9 @@ export function Header() {
   return (
     <header className="w-full h-16 flex items-center justify-between px-6 bg-white border-b shadow-sm">
       <div className="flex items-center gap-3">
-        <img src="/LOGO-LUPA-1.webp" alt="Logo" className="h-10 w-10 object-contain" />
+        <Link to="/">
+          <img src="/LOGO-LUPA-1.webp" alt="Logo" className="h-14 w-14 object-contain cursor-pointer" />
+        </Link>
       </div>
       <div className="flex items-center gap-4">
         <span className="text-gray-600 font-semibold">{name}</span>

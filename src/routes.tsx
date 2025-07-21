@@ -3,6 +3,7 @@ import LoginForm from "./components/user/LoginForm";
 import RegisterForm from "./components/user/RegisterForm";
 import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
+import Home from "./pages/Home";
 import { useAuth } from "./hooks/useAuth";
 import Layout from "./components/layout/Layout";
 import React from "react";
@@ -22,6 +23,10 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 export function AppRoutes() {
   return useRoutes([
     {
+      path: "/",
+      element: <Home />,
+    },
+    {
       path: "/login",
       element: <LoginForm />,
     },
@@ -39,10 +44,6 @@ export function AppRoutes() {
         {
           path: "/profile",
           element: <Profile />,
-        },
-        {
-          path: "/",
-          element: <Navigate to="/dashboard" replace />,
         },
       ],
     },
